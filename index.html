@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AAMush Aegis Africa</title>
+<style>
+:root{color-scheme:dark;--bg:#071727;--panel:#10263a;--line:#29445a;--teal:#39dac5;--gold:#e9bd67;--muted:#9aafc1}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:#edf5fb;font:15px system-ui,sans-serif}
+header{padding:22px;background:#0b2033;border-bottom:1px solid var(--line)}
+h1{margin:0;font-size:25px;color:var(--teal)}
+h2{font-size:18px}
+p{line-height:1.5}
+.small{font-size:12px;color:var(--muted)}
+.warning{padding:12px;background:#382c19;color:#ffe0a1;border:1px solid #755b2d;border-radius:8px;margin-top:15px}
+main{max-width:1100px;margin:auto;padding:16px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:15px;margin-bottom:14px;min-width:0}
+.stat{font-size:27px;font-weight:bold;margin-top:8px}
+button,select{padding:10px;border-radius:7px;border:1px solid #45627a;background:#17364d;color:white;font-weight:600;cursor:pointer}
+button.primary{background:#087c75;border-color:#20b9a7}
+button:disabled{opacity:.4}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+#map{width:100%;height:auto;display:block;background:#081c2b;border-radius:8px}
+.grid{stroke:#234356;stroke-width:.25}
+.track{cursor:pointer}
+.track text{font-size:2.7px;fill:#fff;stroke:#071727;stroke-width:.4px;paint-order:stroke}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:10px 7px;border-bottom:1px solid var(--line)}
+th{color:var(--muted)}
+td{overflow-wrap:anywhere}
+tr[data-id]{cursor:pointer}
+tr[data-id]:hover{background:#18374c}
+.status{font-size:10px;font-weight:bold}
+.NEW{color:#ffd28e}.ACKNOWLEDGED{color:#9bc7ff}.RESOLVED{color:#91ead7}
+#details p{font-size:13px}
+footer{padding:22px;text-align:center;color:var(--muted);font-size:12px}
+@media(max-width:600px){main{padding:10px}.stats{gap:6px}.card{padding:11px}.stat{font-size:22px}header{padding:17px}h1{font-size:21px}table{font-size:11px}th,td{padding:8px 4px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>AAMush Aegis Africa</h1>
+  <p class="small">AAMush Technologies · Tanzania · Prototype v0.1</p>
+  <div class="warning"><strong>SIMULATION ONLY</strong><br>
+  Every event and track is synthetic. This website does not receive live radar or satellite data and cannot detect or intercept real threats.</div>
+</header>
+<main>
+  <section class="stats">
+    <div class="card"><div class="small">TOTAL EVENTS</div><div id="total" class="stat">0</div></div>
+    <div class="card"><div class="small">OPEN EVENTS</div><div id="open" class="stat">0</div></div>
+    <div class="card"><div class="small">NEW ALERTS</div><div id="new" class="stat">0</div></div>
+  </section>
+
+  <section class="card">
+    <h2>Synthetic Airspace Map</h2>
+    <p class="small">Schematic grid only. Positions are not real coordinates.</p>
+    <svg id="map" viewBox="0 0 100 80" role="img" aria-label="Synthetic airspace map"></svg>
+    <div class="controls">
+      <button class="primary" id="generate">Generate synthetic event</button>
+      <button id="warning">Generate warning scenario</button>
+      <button id="connectivity">Connectivity: ONLINE</button>
+    </div>
+    <p id="network" class="small">Local simulation active. No external connection.</p>
+  </section>
+
+  <section class="card">
+    <h2>Event Register</h2>
+    <div class="controls">
+      <label class="small" for="filter">Show status:</label>
+      <select id="filter">
+        <option value="ALL">All events</option>
+        <option value="NEW">New</option>
+        <option value="ACKNOWLEDGED">Acknowledged</option>
+        <option value="RESOLVED">Resolved</option>
+      </select>
+      <button id="export">Export JSON report</button>
+    </div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>ID / Type</th><th>Confidence*</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody id="events"></tbody>
+      </table>
+    </div>
+    <p class="small">*Confidence is a randomly generated scenario attribute, not a measured probability.</p>
+  </section>
+
+  <section class="card" id="details">
+    <h2>Event Details</h2>
+    <p class="small">Select an event from the register or map.</p>
+  </section>
+
+  <section class="card">
+    <h2>Incident Activity Log</h2>
+    <div id="activity" class="small">No activity yet.</div>
+  </section>
+</main>
+<footer>AAMush Technologies · AAMush Aegis Africa · Demonstration software only</footer>
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const colors=["#39dac5","#79a9ff","#ffc66d","#ff858b"];
+const types=["Simulated drone","Simulated aircraft","Simulated unknown event","Simulated missile-warning event"];
+const zones=["Zone A - North","Zone B - East","Zone C - Central","Zone D - South","Zone E - Coastal","Zone F - West"];
+let events=[],activity=[],seq=0,selected=null,net=0;
+function time(){return new Date().toISOString()}
+function stamp(t){return new Date(t).toLocaleTimeString()}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function log(e,action,detail){let item={at:time(),id:e.id,action,detail};e.history.unshift(item);activity.unshift(item);activity=activity.slice(0,40)}
+function create(type){
+ type=type===undefined?Math.floor(Math.random()*4):type;
+ const zone=Math.floor(Math.random()*zones.length);
+ seq++;
+ let e={id:"SIM-"+String(seq).padStart(4,"0"),type:types[type],typeIndex:type,
+ color:colors[type],zone:zones[zone],x:8+Math.random()*84,y:8+Math.random()*64,
+ confidence: type===0?68+Math.floor(Math.random()*29):type===1?78+Math.floor(Math.random()*22):type===2?25+Math.floor(Math.random()*43):30+Math.floor(Math.random()*53),
+ observedAt:time(),receivedAt:time(),source:"AAMUSH-SIM-GENERATOR",
+ provenance:"Synthetic event generated locally for demonstration",status:"NEW",history:[]};
+ events.unshift(e);selected=e.id;log(e,"Event generated","Synthetic scenario event; not real-world surveillance data.");render()
+}
+function status(e,action){
+ if(action==="ACKNOWLEDGED"&&e.status==="NEW"){e.status=action;log(e,"Alert acknowledged","Acknowledged by demonstration operator.")}
+ else if(action==="RESOLVED"&&e.status!=="RESOLVED"){e.status=action;log(e,"Event resolved","Marked resolved by demonstration operator.")}
+ render()
+}
+function renderMap(){
+ let s="",i;
+ for(i=0;i<=100;i+=10)s+=`<line class="grid" x1="${i}" y1="0" x2="${i}" y2="80"/>`;
+ for(i=0;i<=80;i+=10)s+=`<line class="grid" x1="0" y1="${i}" x2="100" y2="${i}"/>`;
+ events.filter(e=>e.status!=="RESOLVED").slice(0,18).forEach(e=>{
+ s+=`<g class="track" data-id="${e.id}"><circle cx="${e.x}" cy="${e.y}" r="2.2" fill="${e.color}" fill-opacity=".35" stroke="${e.color}" stroke-width=".5"/><circle cx="${e.x}" cy="${e.y}" r=".7" fill="${e.color}"/><text x="${e.x+2.5}" y="${e.y+1}">${e.id}</text></g>`});
+ s+=`<text x="2" y="5" fill="#8da8bb" font-size="2.5">SYNTHETIC GRID — NOT GEOGRAPHICALLY ACCURATE</text>`;
+ $("map").innerHTML=s;
+ $("map").querySelectorAll("[data-id]").forEach(g=>g.addEventListener("click",()=>{selected=g.dataset.id;render()}))
+}
+function render(){
+ $("total").textContent=events.length;
+ $("open").textContent=events.filter(e=>e.status!=="RESOLVED").length;
+ $("new").textContent=events.filter(e=>e.status==="NEW").length;
+ renderMap();
+ let filter=$("filter").value;
+ let list=events.filter(e=>filter==="ALL"||e.status===filter);
+ $("events").innerHTML=list.map(e=>`<tr data-id="${e.id}">
+ <td><strong>${esc(e.id)}</strong><br><span class="small">${esc(e.type)}</span></td>
+ <td>${e.confidence}%<br><span class="small">synthetic</span></td>
+ <td class="status ${e.status}">${e.status}</td>
+ <td><button data-action="ack" data-id="${e.id}" ${e.status!=="NEW"?"disabled":""}>Acknowledge</button><br><br><button data-action="resolve" data-id="${e.id}" ${e.status==="RESOLVED"?"disabled":""}>Resolve</button></td></tr>`).join("")||'<tr><td colspan="4">No events in this filter.</td></tr>';
+ $("events").querySelectorAll("tr[data-id]").forEach(tr=>tr.addEventListener("click",ev=>{
+ const button=ev.target.closest("button");
+ if(button){ev.stopPropagation();const e=events.find(x=>x.id===button.dataset.id);status(e,button.dataset.action==="ack"?"ACKNOWLEDGED":"RESOLVED");return}
+ selected=tr.dataset.id;render()
+ }));
+ let e=events.find(x=>x.id===selected);
+ $("details").innerHTML=e?`<h2>Event Details: ${esc(e.id)}</h2>
+ <p><strong>Type:</strong> ${esc(e.type)}</p><p><strong>Status:</strong> ${e.status}</p>
+ <p><strong>Scenario confidence:</strong> ${e.confidence}% — synthetic attribute only.</p>
+ <p><strong>Scenario zone:</strong> ${esc(e.zone)} — not a real location.</p>
+ <p><strong>Observed UTC:</strong> ${esc(e.observedAt)}</p><p><strong>Received UTC:</strong> ${esc(e.receivedAt)}</p>
+ <p><strong>Source:</strong> ${esc(e.source)}</p><p><strong>Provenance:</strong> ${esc(e.provenance)}</p>
+ <p><strong>Canvas position:</strong> ${e.x.toFixed(1)}, ${e.y.toFixed(1)} — not latitude/longitude.</p>
+ <h3>Event History</h3>${e.history.map(h=>`<p class="small">${stamp(h.at)} · ${esc(h.action)} — ${esc(h.detail)}</p>`).join("")}`:
+ '<h2>Event Details</h2><p class="small">Select an event from the register or map.</p>';
+ $("activity").innerHTML=activity.slice(0,12).map(a=>`<p>${stamp(a.at)} · <strong>${esc(a.action)}</strong> · ${esc(a.id)} — ${esc(a.detail)}</p>`).join("")||"No activity yet."
+}
+$("generate").addEventListener("click",()=>create());
+$("warning").addEventListener("click",()=>create(3));
+$("filter").addEventListener("change",render);
+$("connectivity").addEventListener("click",()=>{
+ net=(net+1)%3;
+ const names=["ONLINE","DEGRADED","OFFLINE"];
+ $("connectivity").textContent="Connectivity: "+names[net];
+ $("network").textContent=["Local simulation active. No external connection.","Simulated degraded link. No actual network impairment.","Simulated offline state. Local demo remains available."][net]
+});
+$("export").addEventListener("click",()=>{
+ const data={report_type:"AAMush synthetic prototype report",generated_at:time(),disclaimer:"All records are synthetic demonstration data, not real surveillance or operational defence information.",events};
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+ const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="aamush-synthetic-report.json";a.click();URL.revokeObjectURL(a.href)
+});
+create(0);create(2);create(1);
+})();
+</script>
+</body>
+</html>
