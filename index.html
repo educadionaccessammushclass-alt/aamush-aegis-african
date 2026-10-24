@@ -2,124 +2,200 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#071426">
-<title>AAMush Aegis Africa | Command Centre</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AAMush Aegis Africa Command Centre</title>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
 <style>
-:root{color-scheme:dark;--bg:#071426;--p:#102238;--line:#2b4560;--text:#edf5ff;--muted:#9eb2c8;--gold:#e7bf68;--teal:#58d7cf;--green:#77dda2;--red:#ff8585}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,Arial,sans-serif}
-button,input,select,textarea{font:inherit}button{cursor:pointer;border:1px solid var(--line);background:#162e47;color:var(--text);padding:9px 12px;border-radius:8px}button:hover{border-color:var(--teal)}button:disabled{opacity:.4}button.primary{background:#135c62}button.gold{background:#51401f}button.danger{background:#4b252d}
-input,select,textarea{width:100%;min-width:0;background:#081827;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:10px}textarea{min-height:80px;resize:vertical}
-header{padding:20px clamp(14px,3vw,34px);display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;background:#0b1b2e;border-bottom:1px solid var(--line)}
-.brand{display:flex;gap:12px;align-items:center}.logo{width:46px;height:46px;display:grid;place-items:center;border:2px solid var(--gold);color:var(--gold);border-radius:12px;font-weight:900}.brand h1{font-size:clamp(19px,3vw,27px);margin:0}
-.muted{color:var(--muted)}.small{font-size:12px}.statusrow,.actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.pill,.tag{display:inline-block;border:1px solid var(--line);border-radius:99px;padding:4px 9px;font-size:11px}.warn{color:var(--gold)}.good{color:var(--green)}
-main{max-width:1450px;margin:auto;padding:22px clamp(12px,2.5vw,28px) 42px}.notice{background:#292317;border:1px solid #80683a;color:#f5dfaa;padding:12px 15px;border-radius:10px;margin-bottom:18px}
-.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}.metric,.panel{background:var(--p);border:1px solid var(--line);border-radius:12px}.metric{padding:14px}.metric .label{color:var(--muted);font-size:12px}.num{font-size:27px;font-weight:750}
-.layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,.85fr);gap:15px;align-items:start}.panel{padding:16px;margin-bottom:15px;min-width:0}.head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}h2{font-size:17px;margin:0 0 12px}h3{font-size:14px;margin:0 0 8px}
-.filters{display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px;margin:12px 0}.records{display:grid;gap:8px}.record{width:100%;text-align:left;background:#0a1b2c;padding:12px}.record.selected{border-color:var(--teal);background:#123044}.recordtop{display:flex;justify-content:space-between;gap:8px}.tag.Open{color:#ffc477}.tag.Acknowledged{color:var(--teal)}.tag.Resolved{color:var(--green)}.tag.High,.tag.Critical{color:var(--red)}
-.empty{padding:22px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:8px}.field{margin-bottom:10px}.field label{display:block;color:var(--muted);font-size:12px;margin-bottom:4px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.full{grid-column:1/-1}
-hr{border:0;border-top:1px solid var(--line);margin:14px 0}.map{background:#091a2a;border:1px solid var(--line);border-radius:9px;overflow:hidden}.map svg{display:block;width:100%;height:auto}.audit{display:grid;gap:8px;max-height:300px;overflow:auto}.audititem{background:#0a1b2b;border-left:2px solid var(--teal);padding:9px;border-radius:0 7px 7px 0;overflow-wrap:anywhere}.audititem time{display:block;color:var(--muted);font-size:11px}.line{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
-footer{text-align:center;color:var(--muted);font-size:12px;padding:20px;border-top:1px solid var(--line)}#toast{display:none;position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#153e42;border:1px solid var(--teal);padding:12px 18px;border-radius:9px;z-index:5;max-width:90%}
-@media(max-width:850px){.layout{grid-template-columns:1fr}}@media(max-width:560px){.metrics{grid-template-columns:repeat(2,1fr)}.filters,.formgrid{grid-template-columns:1fr}.full{grid-column:auto}.panel{padding:12px}}
+:root{color-scheme:dark;--bg:#061321;--panel:#10263b;--line:#29455d;--text:#eaf3fc;--muted:#9bb0c3;--teal:#00d0c2;--gold:#e6c36b;--red:#ff7070;--green:#62e6a5}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px Arial,sans-serif}
+header{padding:18px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
+h1{font-size:23px;margin:0 0 5px}h2{font-size:16px;margin:0}
+button,input,select{font:inherit;border-radius:7px}
+button{padding:9px 12px;background:#123b55;color:white;border:1px solid #315c74;cursor:pointer}
+button:hover{border-color:var(--teal)}button:disabled{opacity:.5}
+.primary{background:#007e7c}
+input,select{background:#071a2b;color:white;border:1px solid #31516a;padding:10px;min-width:0;width:100%}
+.wrap{max-width:1500px;margin:auto;padding:15px}
+.muted{color:var(--muted);font-size:12px}
+.status{border:1px solid var(--line);border-radius:20px;padding:7px 10px;color:var(--muted);display:inline-block;font-size:12px}
+.good{color:var(--green)!important}.bad{color:var(--red)!important}
+.warning{background:#302a19;border:1px solid #816c36;padding:12px;border-radius:8px;color:#f7df9a;margin-bottom:14px;line-height:1.5}
+.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.metric,.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;min-width:0}
+.metric span{display:block;color:var(--muted);font-size:11px;text-transform:uppercase}
+.metric strong{display:block;font-size:25px;margin-top:7px}
+.layout{display:grid;grid-template-columns:minmax(300px,.9fr) minmax(0,1.3fr);gap:14px}
+.panelhead{display:flex;justify-content:space-between;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:12px}
+.controls{display:grid;grid-template-columns:1fr 145px;gap:8px;margin:10px 0}
+.actions{display:flex;gap:7px;flex-wrap:wrap}
+.list{display:flex;flex-direction:column;gap:8px;max-height:450px;overflow:auto;margin-top:10px}
+.item{background:#091b2b;border:1px solid var(--line);padding:11px;border-radius:8px;cursor:pointer}
+.item.selected{border-color:var(--teal)}
+.itemtop{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.callsign{font-weight:bold;font-size:15px}
+.facts{display:flex;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:12px;margin-top:7px}
+#map{height:450px;background:#071827;border-radius:8px;overflow:hidden}
+.detail{margin-top:11px;background:#091b2b;padding:12px;border-radius:8px;border:1px solid var(--line);overflow-wrap:anywhere}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.grid span{display:block;color:var(--muted);font-size:10px;text-transform:uppercase}
+.grid strong{display:block;margin-top:4px}
+footer{padding:15px 0;color:var(--muted);font-size:12px;line-height:1.5}
+a{color:#76e6df}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,1fr)}#map{height:380px}}
+@media(max-width:500px){.wrap{padding:9px}.grid{grid-template-columns:repeat(2,1fr)}.controls{grid-template-columns:1fr}#map{height:330px}}
 </style>
 </head>
 <body>
 <header>
- <div class="brand"><div class="logo">AA</div><div><h1>AAMush Aegis Africa</h1><div class="muted small">Interactive Command Centre · Human-reviewed workflows</div></div></div>
- <div class="statusrow"><span class="pill warn">Aircraft feed: NOT CONNECTED</span><span class="pill" id="network">Checking network…</span><span class="pill" id="clock">--:--:--</span></div>
+ <div><h1>AAMush Aegis Africa</h1><div class="muted">Airspace Awareness Command Centre</div></div>
+ <div class="actions"><span id="feedStatus" class="status bad">Feed: NOT CONNECTED</span><span id="network" class="status">Network: checking</span><span id="clock" class="status">--:--:--</span></div>
 </header>
-<main>
- <div class="notice"><strong>DATA INTEGRITY NOTICE:</strong> This is a functional browser-based incident workspace. Records are manually entered and stored in this browser; they are not live aircraft detections. The map is schematic. No external aircraft feed or secure backend is connected. Do not use this prototype for operational decisions.</div>
+<main class="wrap">
+ <div class="warning"><strong>Data notice:</strong> Aircraft are shown only when an external provider returns observations. ADS-B coverage is incomplete. Starlink supplies internet connectivity, not aircraft observations. Aireon data requires authorized access. This prototype is not a certified surveillance system or a safety-critical decision tool.</div>
  <section class="metrics">
-  <div class="metric"><div class="label">TOTAL RECORDS</div><div class="num" id="total">0</div></div>
-  <div class="metric"><div class="label">OPEN</div><div class="num" id="openCount">0</div></div>
-  <div class="metric"><div class="label">ACKNOWLEDGED</div><div class="num" id="ackCount">0</div></div>
-  <div class="metric"><div class="label">RESOLVED</div><div class="num" id="resolvedCount">0</div></div>
+  <div class="metric"><span>Aircraft received</span><strong id="total">0</strong></div>
+  <div class="metric"><span>With position</span><strong id="positioned">0</strong></div>
+  <div class="metric"><span>Reported airborne</span><strong id="airborne">0</strong></div>
+  <div class="metric"><span>Last update</span><strong id="updated" style="font-size:15px">Never</strong></div>
  </section>
  <div class="layout">
- <section>
-  <div class="panel">
-   <div class="head"><h2>Incident records</h2><div class="actions"><button class="primary" id="newBtn">+ New record</button><button id="exportBtn">Export records</button></div></div>
-   <div class="filters"><input id="search" placeholder="Search title, ID, location…" aria-label="Search records"><select id="statusFilter"><option value="all">All statuses</option><option>Open</option><option>Acknowledged</option><option>Resolved</option></select><select id="categoryFilter"><option value="all">All categories</option><option>Airspace safety</option><option>Infrastructure</option><option>Data quality</option><option>Communications</option><option>Other</option></select></div>
-   <div class="muted small" id="listCount"></div><div class="records" id="records"></div>
-  </div>
-  <div class="panel">
-   <div class="head"><h2 id="editorHeading">Create record</h2><button id="clearFormBtn">Clear form</button></div>
-   <form id="recordForm">
-    <div class="formgrid">
-     <div class="field full"><label for="title">Record title *</label><input id="title" maxlength="120" required placeholder="Describe the report or issue"></div>
-     <div class="field"><label for="category">Category</label><select id="category"><option>Airspace safety</option><option>Infrastructure</option><option>Data quality</option><option>Communications</option><option>Other</option></select></div>
-     <div class="field"><label for="priority">Priority</label><select id="priority"><option>Low</option><option selected>Medium</option><option>High</option><option>Critical</option></select></div>
-     <div class="field"><label for="location">Location / area</label><input id="location" maxlength="120" placeholder="Optional description"></div>
-     <div class="field"><label for="source">Source / provenance</label><input id="source" maxlength="160" placeholder="e.g. Manual report"></div>
-     <div class="field full"><label for="description">Description</label><textarea id="description" maxlength="3000" placeholder="Record facts, uncertainties, and follow-up needs"></textarea></div>
-    </div>
-    <div class="actions"><button class="primary" type="submit" id="saveBtn">Save new record</button><button type="button" id="ackBtn" disabled>Acknowledge</button><button type="button" class="gold" id="resolveBtn" disabled>Resolve</button><button type="button" id="reopenBtn" disabled>Reopen</button><button type="button" class="danger" id="deleteBtn" disabled>Delete record</button></div>
-   </form>
-  </div>
-  <div class="panel">
-   <div class="head"><h2>Analyst notes</h2><span class="pill" id="noteCount">No record selected</span></div>
-   <div id="notes"><div class="empty">Select a record to view notes.</div></div>
-   <div class="field"><label for="noteText">New note</label><textarea id="noteText" maxlength="2000" placeholder="Enter a review note…" disabled></textarea></div><button class="primary" id="addNoteBtn" disabled>Save note</button>
-  </div>
- </section>
- <aside>
-  <div class="panel"><div class="head"><h2>Workspace map</h2><span class="pill">Schematic only</span></div>
-   <div class="map"><svg id="map" viewBox="0 0 600 300" role="img" aria-label="Schematic record markers, not aircraft positions"><defs><pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M30 0H0V30" fill="none" stroke="#1c354b"/></pattern></defs><rect width="600" height="300" fill="#091a2a"/><rect width="600" height="300" fill="url(#grid)"/><path d="M35 75L130 35L210 65L300 32L380 70L490 48L560 105L530 180L555 240L455 275L365 250L270 285L185 245L100 260L55 185Z" fill="#132d3c" stroke="#315167" stroke-width="2"/><path d="M75 115L190 145L290 95L400 150L510 120M100 225L210 190L320 230L440 195L515 225M190 145L210 190L185 245M400 150L440 195L455 275" stroke="#29485d" fill="none"/><text x="15" y="20" fill="#9eb2c8" font-size="11">ILLUSTRATIVE MARKERS · NOT GEOLOCATED</text><g id="markers"></g></svg></div><p class="muted small">Select a marker to open its record. Positions are illustrative and do not represent aircraft.</p>
-  </div>
-  <div class="panel"><h2>Backup and restore</h2><p class="muted small">Download a backup before moving devices or clearing browser data. Importing replaces the current workspace.</p><div class="actions"><button id="backupBtn">Download full backup</button><button id="importBtn">Import backup</button><input id="importFile" type="file" accept=".json,application/json" hidden></div><hr>
-   <div class="line"><span>Browser storage</span><span class="pill" id="storageState">Checking</span></div><div class="line"><span>Live aircraft data</span><span class="pill warn">Not connected</span></div><div class="line"><span>Secure shared backend</span><span class="pill warn">Not configured</span></div><div class="line"><span>Automated engagement</span><span class="pill">Disabled</span></div><p class="muted small" id="storageMessage">Records remain in this browser and are not shared with other devices.</p>
-  </div>
-  <div class="panel"><div class="head"><h2>Audit history</h2><button id="auditExportBtn">Export audit</button></div><div class="audit" id="audit"></div><div class="actions" style="margin-top:10px"><button id="refreshBtn">Refresh status</button><button class="danger" id="clearAuditBtn">Clear audit</button><button class="danger" id="clearAllBtn">Delete all records</button></div><p class="muted small">Local audit history is not a tamper-proof institutional audit service.</p></div>
- </aside>
+  <section class="panel">
+   <div class="panelhead"><h2>External aircraft feed</h2><div class="actions"><button id="refresh" class="primary">Refresh feed</button><button id="auto">Auto-refresh: Off</button></div></div>
+   <div class="controls"><input id="search" placeholder="Search callsign or ICAO address"><select id="scope"><option value="east">East Africa</option><option value="global">Global</option></select></div>
+   <div class="controls"><select id="sort"><option value="distance">Nearest to Dar es Salaam</option><option value="callsign">Callsign A–Z</option><option value="altitude">Altitude high to low</option><option value="speed">Speed high to low</option></select><button id="clear">Clear filters</button></div>
+   <div id="source" class="muted">Source: OpenSky Network REST API. Access limits apply.</div>
+   <div id="list" class="list">Press Refresh feed to request aircraft observations.</div>
+   <div class="actions" style="margin-top:12px"><button id="json">Export JSON</button><button id="csv">Export CSV</button></div>
+   <footer><a href="https://openskynetwork.github.io/opensky-api/rest.html" target="_blank" rel="noopener">OpenSky API documentation</a>. Browser requests can fail because of provider access rules, quotas or cross-origin restrictions.</footer>
+  </section>
+  <section class="panel">
+   <div class="panelhead"><div><h2>Satellite map</h2><div class="muted">Select an aircraft marker to inspect its reported state.</div></div><div class="actions"><button id="center">Center East Africa</button><button id="fullscreen">Full screen</button><button id="layer">Map: Satellite</button></div></div>
+   <div id="map"></div><div id="mapStatus" class="status" style="margin-top:10px">Loading map…</div>
+   <div id="details" class="detail">Select an aircraft from the list or map.</div>
+   <footer>Satellite imagery: EOX Sentinel-2 cloudless. Availability depends on the tile provider.</footer>
+  </section>
  </div>
+ <footer>AAMush Aegis Africa · Live satellite-based aircraft tracking requires authorized provider access and a secure backend.</footer>
 </main>
-<footer>AAMush Technologies · AAMush Aegis Africa · Prototype workspace · Human authority and manual review</footer>
-<div id="toast" role="status" aria-live="polite"></div>
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script>
-(()=>{
+(function(){
 "use strict";
-const KEY="aamush_aegis_africa_v1", $=id=>document.getElementById(id);
-let records=[],audit=[],selected=null,editing=null,timer;
-const now=()=>new Date().toISOString();
-const uid=p=>p+"-"+Date.now().toString(36).toUpperCase()+"-"+Math.random().toString(36).slice(2,7).toUpperCase();
-const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const fmt=v=>{let d=new Date(v);return isNaN(d)?"Unknown":d.toLocaleString()};
-function toast(s){$("toast").textContent=s;$("toast").style.display="block";clearTimeout(timer);timer=setTimeout(()=>$("toast").style.display="none",3000)}
-function persist(){try{localStorage.setItem(KEY,JSON.stringify({version:1,records,audit}));$("storageState").textContent="Saved";$("storageState").className="pill good";$("storageMessage").textContent="Last save: "+new Date().toLocaleTimeString()+". Not synchronized to other devices.";return true}catch(e){$("storageState").textContent="Save failed";toast("Storage failed. Export a backup if possible.");return false}}
-function log(action,r,detail=""){audit.unshift({id:uid("AUD"),time:now(),action,recordId:r?.id||"",title:r?.title||"",detail});audit=audit.slice(0,500);persist();renderAudit()}
-function load(){try{let raw=localStorage.getItem(KEY);if(!raw)return;let d=JSON.parse(raw);if(!Array.isArray(d.records)||!Array.isArray(d.audit))throw Error("Invalid workspace");records=d.records;audit=d.audit}catch(e){console.error(e);toast("Saved data could not be read; it was not overwritten.")}}
-function seed(){if(records.length)return;let t=Date.now();records=[{id:uid("INC"),title:"Example: review an airspace safety report",category:"Airspace safety",priority:"Medium",location:"Example area A",source:"Illustrative manual entry",description:"Sample record for interface testing. It is not a real observation.",status:"Open",createdAt:new Date(t-3600000).toISOString(),updatedAt:new Date(t-3600000).toISOString(),notes:[]},{id:uid("INC"),title:"Example: check data-quality discrepancy",category:"Data quality",priority:"Low",location:"Example area B",source:"Illustrative manual entry",description:"Sample record demonstrating acknowledgement and filtering.",status:"Acknowledged",createdAt:new Date(t-7200000).toISOString(),updatedAt:new Date(t-1800000).toISOString(),notes:[]},{id:uid("INC"),title:"Example: review communications report",category:"Communications",priority:"High",location:"Example area C",source:"Illustrative manual entry",description:"Example only, not an active warning.",status:"Resolved",createdAt:new Date(t-86400000).toISOString(),updatedAt:new Date(t-4000000).toISOString(),notes:[]}];audit=[{id:uid("AUD"),time:now(),action:"Workspace initialized",recordId:"",title:"",detail:"Clearly labelled example records created for testing."}];persist()}
-function filtered(){let q=$("search").value.trim().toLowerCase(),s=$("statusFilter").value,c=$("categoryFilter").value;return records.filter(r=>(!q||[r.id,r.title,r.location,r.description,r.source,r.category].join(" ").toLowerCase().includes(q))&&(s==="all"||r.status===s)&&(c==="all"||r.category===c)).sort((a,b)=>new Date(b.updatedAt)-new Date(a.updatedAt))}
-function renderMetrics(){$("total").textContent=records.length;$("openCount").textContent=records.filter(r=>r.status==="Open").length;$("ackCount").textContent=records.filter(r=>r.status==="Acknowledged").length;$("resolvedCount").textContent=records.filter(r=>r.status==="Resolved").length}
-function renderRecords(){let list=filtered();$("listCount").textContent=list.length+" record(s) shown";$("records").innerHTML=list.length?list.map(r=>`<button class="record ${r.id===selected?"selected":""}" data-record="${esc(r.id)}"><div class="recordtop"><strong>${esc(r.title)}</strong><span class="tag ${esc(r.status)}">${esc(r.status)}</span></div><div class="muted small">${esc(r.id)} · ${esc(r.location||"Location not specified")}</div><div><span class="tag ${esc(r.priority)}">${esc(r.priority)} priority</span> <span class="tag">${esc(r.category)}</span></div><div class="muted small">Updated ${esc(fmt(r.updatedAt))}</div></button>`).join(""):'<div class="empty">No matching records. Change filters or create a record.</div>';document.querySelectorAll("[data-record]").forEach(b=>b.addEventListener("click",()=>select(b.dataset.record)))}
-function renderMap(){let list=filtered().slice(0,12),colors={Open:"#ffc477",Acknowledged:"#58d7cf",Resolved:"#77dda2"};$("markers").innerHTML=list.map((r,i)=>{let x=60+(i*137+37)%475,y=55+(i*71+29)%190;return `<g data-marker="${esc(r.id)}" tabindex="0" role="button" aria-label="Select ${esc(r.title)}" style="cursor:pointer"><circle cx="${x}" cy="${y}" r="${r.id===selected?13:8}" fill="${colors[r.status]}" stroke="#fff" stroke-width="${r.id===selected?2:0}"/><text x="${x+11}" y="${y-8}" fill="#edf5ff" font-size="11">${i+1}</text></g>`}).join("");document.querySelectorAll("[data-marker]").forEach(g=>{let f=()=>select(g.dataset.marker);g.addEventListener("click",f);g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();f()}})})}
-function renderAudit(){$("audit").innerHTML=audit.length?audit.slice(0,100).map(a=>`<div class="audititem"><strong>${esc(a.action)}</strong>${a.title?" · "+esc(a.title):""}<div class="muted small">${esc(a.recordId)} ${esc(a.detail)}</div><time>${esc(fmt(a.time))}</time></div>`).join(""):'<div class="empty">No audit events.</div>'}
-function renderNotes(r){$("noteCount").textContent=r?r.notes.length+" note(s)":"No record selected";$("notes").innerHTML=r?(r.notes.length?r.notes.slice().reverse().map(n=>`<div class="audititem">${esc(n.text)}<div class="muted small">${esc(fmt(n.time))}</div></div>`).join(""):'<div class="empty">No notes for this record yet.</div>'):'<div class="empty">Select a record to view notes.</div>';$("noteText").disabled=!r;$("addNoteBtn").disabled=!r}
-function renderDetails(){let r=records.find(x=>x.id===selected);["ackBtn","resolveBtn","reopenBtn","deleteBtn"].forEach(id=>$(id).disabled=!r);$("ackBtn").disabled=!r||r.status!=="Open";$("resolveBtn").disabled=!r||r.status==="Resolved";$("reopenBtn").disabled=!r||r.status!=="Resolved";if(!editing){$("editorHeading").textContent=r?"Selected record: "+r.id:"Create record";$("saveBtn").textContent="Save new record"}renderNotes(r)}
-function render(){renderMetrics();renderRecords();renderMap();renderAudit();renderDetails()}
-function select(id){selected=id;editing=null;let r=records.find(x=>x.id===id);if(!r)return;$("title").value=r.title;$("category").value=r.category;$("priority").value=r.priority;$("location").value=r.location||"";$("source").value=r.source||"";$("description").value=r.description||"";$("editorHeading").textContent="Edit selected record";$("saveBtn").textContent="Save changes";render()}
-function clearForm(){editing=null;$("recordForm").reset();$("priority").value="Medium";$("editorHeading").textContent="Create record";$("saveBtn").textContent="Save new record"}
-function newRecord(){selected=null;clearForm();render()}
-$("newBtn").addEventListener("click",newRecord);$("clearFormBtn").addEventListener("click",()=>{clearForm();render()});
-$("recordForm").addEventListener("submit",e=>{e.preventDefault();let title=$("title").value.trim();if(!title)return toast("A title is required.");let data={title,category:$("category").value,priority:$("priority").value,location:$("location").value.trim(),source:$("source").value.trim(),description:$("description").value.trim()},r;if(editing){r=records.find(x=>x.id===editing);if(!r)return toast("Record not found.");Object.assign(r,data,{updatedAt:now()});log("Record updated",r,"Record fields edited.");toast("Record updated.")}else{r={id:uid("INC"),...data,status:"Open",createdAt:now(),updatedAt:now(),notes:[]};records.unshift(r);log("Record created",r,"New user-entered record.");toast("Record created.")}selected=r.id;editing=null;persist();render()});
-function changeStatus(status){let r=records.find(x=>x.id===selected);if(!r)return;if(r.status===status)return toast("Record already has that status.");let old=r.status;r.status=status;r.updatedAt=now();log("Status changed",r,old+" → "+status);persist();render();toast("Status updated: "+status)}
-$("ackBtn").addEventListener("click",()=>changeStatus("Acknowledged"));$("resolveBtn").addEventListener("click",()=>changeStatus("Resolved"));$("reopenBtn").addEventListener("click",()=>changeStatus("Open"));
-$("deleteBtn").addEventListener("click",()=>{let r=records.find(x=>x.id===selected);if(!r)return;if(!confirm("Delete this record and its notes? Export a backup first if needed."))return;records=records.filter(x=>x.id!==selected);selected=null;clearForm();log("Record deleted",r,"Deleted by user.");persist();render();toast("Record deleted.")});
-$("addNoteBtn").addEventListener("click",()=>{let r=records.find(x=>x.id===selected),text=$("noteText").value.trim();if(!r)return toast("Select a record first.");if(!text)return toast("Enter a note first.");r.notes.push({id:uid("NOTE"),time:now(),text});r.updatedAt=now();$("noteText").value="";log("Analyst note added",r,"A note was added.");persist();render();toast("Note saved.")});
-["search","statusFilter","categoryFilter"].forEach(id=>$(id).addEventListener(id==="search"?"input":"change",()=>{renderRecords();renderMap()}));
-function download(name,data){let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);toast("Download prepared: "+name)}
-$("exportBtn").addEventListener("click",()=>download("aegis-records.json",{version:1,exportedAt:now(),records}));
-$("backupBtn").addEventListener("click",()=>download("aegis-workspace-backup.json",{version:1,exportedAt:now(),records,audit}));
-$("auditExportBtn").addEventListener("click",()=>download("aegis-audit.json",{version:1,exportedAt:now(),audit}));
-$("importBtn").addEventListener("click",()=>$("importFile").click());
-$("importFile").addEventListener("change",async e=>{let file=e.target.files[0];if(!file)return;try{let d=JSON.parse(await file.text());if(!d||!Array.isArray(d.records)||!Array.isArray(d.audit))throw Error("File must contain records and audit arrays.");if(!confirm("Replace the current workspace with "+d.records.length+" imported records?"))return;records=d.records.map(r=>({...r,notes:Array.isArray(r.notes)?r.notes:[]}));audit=d.audit;selected=null;clearForm();persist();render();toast("Backup imported.")}catch(err){alert("Import failed: "+err.message)}finally{e.target.value=""}});
-$("clearAuditBtn").addEventListener("click",()=>{if(!confirm("Clear all local audit history?"))return;audit=[];persist();renderAudit();toast("Audit cleared.")});
-$("clearAllBtn").addEventListener("click",()=>{if(!confirm("Delete all records and audit history from this browser? Export a backup first."))return;records=[];audit=[];selected=null;clearForm();persist();render();toast("Workspace cleared.")});
-function status(){ $("network").textContent=navigator.onLine?"Network: online":"Network: offline";$("network").className="pill "+(navigator.onLine?"good":"warn");try{localStorage.setItem(KEY+"-test","1");localStorage.removeItem(KEY+"-test");$("storageState").textContent="Available";$("storageState").className="pill good"}catch(e){$("storageState").textContent="Unavailable";$("storageState").className="pill warn"}}
-function tick(){$("clock").textContent=new Date().toLocaleTimeString()}
-$("refreshBtn").addEventListener("click",()=>{status();toast("Browser status refreshed.")});window.addEventListener("online",status);window.addEventListener("offline",status);
-load();seed();status();tick();setInterval(tick,1000);render();
+const $=id=>document.getElementById(id);
+const EAST={west:25,south:-18,east:53,north:16};
+let aircraft=[],selected=null,markers=new Map(),timer=null,lastUpdated=null,map=null,mapLayer="satellite",busy=false;
+function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function fmt(v,u=""){return Number.isFinite(v)?Math.round(v).toLocaleString()+u:"—";}
+function distance(lat,lon){const r=Math.PI/180,a=lat*r,b=-6.8*r,dl=(39.2-lon)*r,x=Math.sin((b-a)/2)**2+Math.cos(a)*Math.cos(b)*Math.sin(dl/2)**2;return 6371*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
+function feedStatus(text,ok){$("feedStatus").textContent=text;$("feedStatus").className="status "+(ok?"good":"bad");}
+function normalize(s){return{hex:String(s[0]||"").trim().toLowerCase(),callsign:String(s[1]||"").trim()||"Unknown",country:s[2]||"Unknown",positionTime:s[3]||null,lastContact:s[4]||null,lon:typeof s[5]==="number"?s[5]:null,lat:typeof s[6]==="number"?s[6]:null,altitude:typeof s[7]==="number"?s[7]:null,ground:!!s[8],speed:typeof s[9]==="number"?s[9]:null,heading:typeof s[10]==="number"?s[10]:null,verticalRate:typeof s[11]==="number"?s[11]:null,geoAltitude:typeof s[13]==="number"?s[13]:null,squawk:s[14]||null};}
+function initMap(){
+ if(!window.maplibregl){$("mapStatus").textContent="Map library unavailable; check internet";return;}
+ try{
+  map=new maplibregl.Map({container:"map",center:[39.2,-6.8],zoom:4,style:{version:8,sources:{
+   satellite:{type:"raster",tiles:["https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2020_3857/default/g/{z}/{y}/{x}.jpg"],tileSize:256,attribution:"Imagery © EOX / Sentinel-2"},
+   street:{type:"raster",tiles:["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],tileSize:256,attribution:"© OpenStreetMap contributors"}
+  },layers:[{id:"imagery",type:"raster",source:"satellite"}]}});
+  map.addControl(new maplibregl.NavigationControl(),"top-right");
+  map.on("load",()=>{$("mapStatus").textContent="Map loaded";$("mapStatus").className="status good";drawMarkers();});
+  map.on("error",()=>{$("mapStatus").textContent="Map tile/network warning";});
+ }catch(e){$("mapStatus").textContent="Map initialisation failed";}
+}
+function filtered(){
+ const q=$("search").value.trim().toLowerCase();
+ let arr=aircraft.filter(a=>(!q||a.callsign.toLowerCase().includes(q)||a.hex.includes(q))&&a.lat!==null&&a.lon!==null);
+ if($("scope").value==="east")arr=arr.filter(a=>a.lat>=EAST.south&&a.lat<=EAST.north&&a.lon>=EAST.west&&a.lon<=EAST.east);
+ const s=$("sort").value;
+ arr.sort((a,b)=>s==="callsign"?a.callsign.localeCompare(b.callsign):s==="altitude"?(b.altitude||0)-(a.altitude||0):s==="speed"?(b.speed||0)-(a.speed||0):distance(a.lat,a.lon)-distance(b.lat,b.lon));
+ return arr;
+}
+async function refreshFeed(){
+ if(busy)return;busy=true;$("refresh").disabled=true;$("refresh").textContent="Connecting…";feedStatus("Feed: CONNECTING",false);
+ try{
+  let url="https://opensky-network.org/api/states/all";
+  if($("scope").value==="east")url+="?lamin="+EAST.south+"&lomin="+EAST.west+"&lamax="+EAST.north+"&lomax="+EAST.east;
+  const response=await fetch(url,{cache:"no-store"});
+  if(!response.ok)throw Error("Provider HTTP "+response.status);
+  const data=await response.json();
+  if(!Array.isArray(data.states))throw Error("Unexpected provider response");
+  aircraft=data.states.map(normalize);lastUpdated=new Date();
+  feedStatus("Feed: CONNECTED",true);
+  $("source").textContent="OpenSky Network · Retrieved "+lastUpdated.toLocaleString()+" · "+aircraft.length+" state records";
+  render();
+ }catch(e){
+  feedStatus("Feed: NOT CONNECTED",false);
+  $("source").textContent="Request failed: "+e.message+". No sample aircraft have been added.";
+  alert("Aircraft feed request failed: "+e.message+"\n\nA secured backend or provider authorization may be required.");
+ }finally{busy=false;$("refresh").disabled=false;$("refresh").textContent="Refresh feed";}
+}
+function render(){
+ const pos=aircraft.filter(a=>a.lat!==null&&a.lon!==null);
+ $("total").textContent=aircraft.length.toLocaleString();$("positioned").textContent=pos.length.toLocaleString();
+ $("airborne").textContent=aircraft.filter(a=>!a.ground&&a.lat!==null).length.toLocaleString();
+ $("updated").textContent=lastUpdated?lastUpdated.toLocaleTimeString():"Never";
+ const arr=filtered();
+ $("list").innerHTML=arr.length?arr.slice(0,300).map(a=>`<div class="item ${selected===a.hex?"selected":""}" data-hex="${esc(a.hex)}"><div class="itemtop"><span class="callsign">${esc(a.callsign)}</span><span class="muted">${esc(a.hex)}</span></div><div class="facts"><span>Altitude: ${fmt(a.altitude," m")}</span><span>Speed: ${fmt(a.speed===null?NaN:a.speed*3.6," km/h")}</span><span>${a.ground?"On ground":"Not reported on ground"}</span></div></div>`).join(""):'<div class="muted">No aircraft with positions match these filters.</div>';
+ $("list").querySelectorAll("[data-hex]").forEach(el=>el.addEventListener("click",()=>select(el.dataset.hex,true)));
+ drawMarkers();
+ const a=aircraft.find(x=>x.hex===selected);if(a)showDetails(a);
+}
+function drawMarkers(){
+ if(!map||!map.loaded())return;
+ markers.forEach(m=>m.remove());markers.clear();
+ filtered().slice(0,500).forEach(a=>{
+  const el=document.createElement("button");el.type="button";el.textContent="✈";el.title=a.callsign+" · "+a.hex;
+  el.style.cssText="padding:2px;width:30px;height:30px;border-radius:50%;background:#007e7c;border:2px solid #e6c36b;color:white";
+  const marker=new maplibregl.Marker({element:el}).setLngLat([a.lon,a.lat]).addTo(map);
+  el.addEventListener("click",()=>select(a.hex,false));markers.set(a.hex,marker);
+ });
+}
+function showDetails(a){
+ $("details").innerHTML=`<h2>${esc(a.callsign)}</h2><div class="grid">
+ <div><span>ICAO address</span><strong>${esc(a.hex)}</strong></div><div><span>Country</span><strong>${esc(a.country)}</strong></div>
+ <div><span>Altitude</span><strong>${fmt(a.altitude," m")}</strong></div><div><span>Ground speed</span><strong>${fmt(a.speed===null?NaN:a.speed*3.6," km/h")}</strong></div>
+ <div><span>Heading</span><strong>${fmt(a.heading,"°")}</strong></div><div><span>Vertical rate</span><strong>${fmt(a.verticalRate," m/s")}</strong></div>
+ <div><span>Latitude</span><strong>${fmt(a.lat)}</strong></div><div><span>Longitude</span><strong>${fmt(a.lon)}</strong></div>
+ <div><span>Squawk</span><strong>${esc(a.squawk||"—")}</strong></div>
+ <div><span>Position time</span><strong>${a.positionTime?new Date(a.positionTime*1000).toLocaleString():"Unavailable"}</strong></div>
+ <div><span>Last contact</span><strong>${a.lastContact?new Date(a.lastContact*1000).toLocaleString():"Unavailable"}</strong></div>
+ <div><span>State</span><strong>${a.ground?"On ground":"Not reported on ground"}</strong></div></div>`;
+}
+function select(hex,fly){
+ selected=hex;const a=aircraft.find(x=>x.hex===hex);if(!a)return;showDetails(a);
+ $("list").querySelectorAll("[data-hex]").forEach(el=>el.classList.toggle("selected",el.dataset.hex===hex));
+ if(fly&&map&&a.lat!==null&&a.lon!==null)map.flyTo({center:[a.lon,a.lat],zoom:7});
+}
+function download(name,text,type){
+ const url=URL.createObjectURL(new Blob([text],{type})),a=document.createElement("a");
+ a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+$("refresh").addEventListener("click",refreshFeed);
+$("auto").addEventListener("click",()=>{if(timer){clearInterval(timer);timer=null;$("auto").textContent="Auto-refresh: Off";}else{timer=setInterval(refreshFeed,60000);$("auto").textContent="Auto-refresh: On";refreshFeed();}});
+$("search").addEventListener("input",render);
+$("scope").addEventListener("change",()=>{render();if(lastUpdated)refreshFeed();});
+$("sort").addEventListener("change",render);
+$("clear").addEventListener("click",()=>{$("search").value="";$("sort").value="distance";$("scope").value="east";render();});
+$("json").addEventListener("click",()=>download("aegis-aircraft.json",JSON.stringify({exportedAt:new Date().toISOString(),source:"OpenSky Network response",aircraft},null,2),"application/json"));
+$("csv").addEventListener("click",()=>{
+ const cols=["hex","callsign","country","lat","lon","altitude","ground","speed","heading","verticalRate","squawk","positionTime","lastContact"];
+ const quote=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
+ download("aegis-aircraft.csv",[cols.join(","),...aircraft.map(a=>cols.map(k=>quote(a[k])).join(","))].join("\r\n"),"text/csv;charset=utf-8");
+});
+$("center").addEventListener("click",()=>{if(map)map.flyTo({center:[39.2,-6.8],zoom:4});});
+$("fullscreen").addEventListener("click",async()=>{try{if(!document.fullscreenElement)await $("map").requestFullscreen();else await document.exitFullscreen();setTimeout(()=>map&&map.resize(),250);}catch(e){alert("Full screen is not available in this browser.");}});
+$("layer").addEventListener("click",()=>{
+ if(!map||!map.getLayer("imagery"))return;
+ mapLayer=mapLayer==="satellite"?"street":"satellite";
+ if(!map.getSource("street"))map.addSource("street",{type:"raster",tiles:["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],tileSize:256,attribution:"© OpenStreetMap contributors"});
+ if(!map.getLayer("street-layer"))map.addLayer({id:"street-layer",type:"raster",source:"street",layout:{visibility:"none"}});
+ map.setLayoutProperty("imagery","visibility",mapLayer==="satellite"?"visible":"none");
+ map.setLayoutProperty("street-layer","visibility",mapLayer==="street"?"visible":"none");
+ $("layer").textContent="Map: "+(mapLayer==="satellite"?"Satellite":"Street");
+});
+function tick(){$("clock").textContent=new Date().toLocaleTimeString();$("network").textContent=navigator.onLine?"Network: online":"Network: offline";$("network").className="status "+(navigator.onLine?"good":"bad");}
+window.addEventListener("online",tick);window.addEventListener("offline",tick);
+initMap();tick();setInterval(tick,1000);
 })();
 </script>
 </body>
