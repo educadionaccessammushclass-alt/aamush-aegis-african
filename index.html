@@ -2,81 +2,101 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AAMush Aegis Africa Command Centre</title>
-<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AAMush Aegis Africa</title>
+<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
 <style>
-:root{color-scheme:dark;--bg:#061321;--panel:#10263b;--line:#29455d;--text:#eaf3fc;--muted:#9bb0c3;--teal:#00d0c2;--gold:#e6c36b;--red:#ff7070;--green:#62e6a5}
+:root{color-scheme:dark;--bg:#061321;--panel:#10263b;--line:#29455d;--text:#eaf3fc;--muted:#9bb0c3;--teal:#00d0c2;--gold:#e6c36b}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font:14px Arial,sans-serif}
-header{padding:18px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
-h1{font-size:23px;margin:0 0 5px}h2{font-size:16px;margin:0}
+header{padding:16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
+h1{font-size:22px;margin:0 0 5px}h2{font-size:16px;margin:0}
 button,input,select{font:inherit;border-radius:7px}
 button{padding:9px 12px;background:#123b55;color:white;border:1px solid #315c74;cursor:pointer}
 button:hover{border-color:var(--teal)}button:disabled{opacity:.5}
-.primary{background:#007e7c}
-input,select{background:#071a2b;color:white;border:1px solid #31516a;padding:10px;min-width:0;width:100%}
-.wrap{max-width:1500px;margin:auto;padding:15px}
+input,select{background:#071a2b;color:white;border:1px solid #31516a;padding:10px;width:100%;min-width:0}
+.wrap{max-width:1500px;margin:auto;padding:14px}
 .muted{color:var(--muted);font-size:12px}
-.status{border:1px solid var(--line);border-radius:20px;padding:7px 10px;color:var(--muted);display:inline-block;font-size:12px}
-.good{color:var(--green)!important}.bad{color:var(--red)!important}
-.warning{background:#302a19;border:1px solid #816c36;padding:12px;border-radius:8px;color:#f7df9a;margin-bottom:14px;line-height:1.5}
+.status{border:1px solid var(--line);border-radius:20px;padding:7px 10px;display:inline-block;font-size:12px}
+.good{color:#62e6a5}.bad{color:#ff7070}
+.notice{background:#302a19;border:1px solid #816c36;padding:12px;border-radius:8px;color:#f7df9a;margin-bottom:14px;line-height:1.5}
 .metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
-.metric,.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;min-width:0}
+.metric,.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:13px;min-width:0}
 .metric span{display:block;color:var(--muted);font-size:11px;text-transform:uppercase}
-.metric strong{display:block;font-size:25px;margin-top:7px}
-.layout{display:grid;grid-template-columns:minmax(300px,.9fr) minmax(0,1.3fr);gap:14px}
-.panelhead{display:flex;justify-content:space-between;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:12px}
-.controls{display:grid;grid-template-columns:1fr 145px;gap:8px;margin:10px 0}
-.actions{display:flex;gap:7px;flex-wrap:wrap}
-.list{display:flex;flex-direction:column;gap:8px;max-height:450px;overflow:auto;margin-top:10px}
+.metric strong{display:block;font-size:24px;margin-top:7px}
+.layout{display:grid;grid-template-columns:minmax(280px,.9fr) minmax(0,1.3fr);gap:14px}
+.panelhead{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.controls,.actions{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.controls>*{flex:1}
+.list{display:flex;flex-direction:column;gap:8px;max-height:440px;overflow:auto;margin-top:10px}
 .item{background:#091b2b;border:1px solid var(--line);padding:11px;border-radius:8px;cursor:pointer}
 .item.selected{border-color:var(--teal)}
 .itemtop{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
 .callsign{font-weight:bold;font-size:15px}
 .facts{display:flex;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:12px;margin-top:7px}
-#map{height:450px;background:#071827;border-radius:8px;overflow:hidden}
+#map{height:440px;background:#071827;border-radius:8px}
 .detail{margin-top:11px;background:#091b2b;padding:12px;border-radius:8px;border:1px solid var(--line);overflow-wrap:anywhere}
 .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .grid span{display:block;color:var(--muted);font-size:10px;text-transform:uppercase}
 .grid strong{display:block;margin-top:4px}
-footer{padding:15px 0;color:var(--muted);font-size:12px;line-height:1.5}
+footer{padding:12px 0;color:var(--muted);font-size:12px;line-height:1.5}
 a{color:#76e6df}
-@media(max-width:900px){.layout{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,1fr)}#map{height:380px}}
-@media(max-width:500px){.wrap{padding:9px}.grid{grid-template-columns:repeat(2,1fr)}.controls{grid-template-columns:1fr}#map{height:330px}}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,1fr)}#map{height:360px}}
+@media(max-width:500px){.wrap{padding:8px}.grid{grid-template-columns:repeat(2,1fr)}#map{height:320px}}
 </style>
 </head>
 <body>
 <header>
- <div><h1>AAMush Aegis Africa</h1><div class="muted">Airspace Awareness Command Centre</div></div>
- <div class="actions"><span id="feedStatus" class="status bad">Feed: NOT CONNECTED</span><span id="network" class="status">Network: checking</span><span id="clock" class="status">--:--:--</span></div>
+ <div><h1>AAMush Aegis Africa</h1><div class="muted">Aircraft Awareness Command Centre</div></div>
+ <div class="actions">
+  <span id="feedStatus" class="status bad">Aircraft feed: NOT CONNECTED</span>
+  <span id="network" class="status">Network: checking</span>
+  <span id="clock" class="status">--:--:--</span>
+ </div>
 </header>
 <main class="wrap">
- <div class="warning"><strong>Data notice:</strong> Aircraft are shown only when an external provider returns observations. ADS-B coverage is incomplete. Starlink supplies internet connectivity, not aircraft observations. Aireon data requires authorized access. This prototype is not a certified surveillance system or a safety-critical decision tool.</div>
+ <div class="notice"><strong>Live-data integrity:</strong> Aircraft appear only when the external provider returns observations. Failed requests are reported honestly; no simulated aircraft are displayed as live data.</div>
  <section class="metrics">
   <div class="metric"><span>Aircraft received</span><strong id="total">0</strong></div>
   <div class="metric"><span>With position</span><strong id="positioned">0</strong></div>
   <div class="metric"><span>Reported airborne</span><strong id="airborne">0</strong></div>
-  <div class="metric"><span>Last update</span><strong id="updated" style="font-size:15px">Never</strong></div>
+  <div class="metric"><span>Last successful update</span><strong id="updated" style="font-size:15px">Never</strong></div>
  </section>
  <div class="layout">
   <section class="panel">
-   <div class="panelhead"><h2>External aircraft feed</h2><div class="actions"><button id="refresh" class="primary">Refresh feed</button><button id="auto">Auto-refresh: Off</button></div></div>
-   <div class="controls"><input id="search" placeholder="Search callsign or ICAO address"><select id="scope"><option value="east">East Africa</option><option value="global">Global</option></select></div>
-   <div class="controls"><select id="sort"><option value="distance">Nearest to Dar es Salaam</option><option value="callsign">Callsign A–Z</option><option value="altitude">Altitude high to low</option><option value="speed">Speed high to low</option></select><button id="clear">Clear filters</button></div>
-   <div id="source" class="muted">Source: OpenSky Network REST API. Access limits apply.</div>
+   <div class="panelhead"><h2>Aircraft feed</h2>
+    <div class="actions"><button id="refresh">Refresh feed</button><button id="auto">Auto-refresh: Off</button></div>
+   </div>
+   <div class="controls">
+    <input id="search" placeholder="Search callsign or ICAO address" aria-label="Search aircraft">
+    <select id="scope" aria-label="Geographic scope"><option value="east">East Africa</option><option value="global">Global</option></select>
+   </div>
+   <div class="controls">
+    <select id="sort" aria-label="Sort aircraft">
+     <option value="distance">Nearest to Dar es Salaam</option>
+     <option value="callsign">Callsign A–Z</option>
+     <option value="altitude">Altitude high to low</option>
+     <option value="speed">Speed high to low</option>
+    </select>
+    <button id="clear">Clear filters</button>
+   </div>
+   <div id="source" class="muted">Source: OpenSky Network REST API.</div>
+   <div id="error" class="muted" role="status"></div>
    <div id="list" class="list">Press Refresh feed to request aircraft observations.</div>
-   <div class="actions" style="margin-top:12px"><button id="json">Export JSON</button><button id="csv">Export CSV</button></div>
-   <footer><a href="https://openskynetwork.github.io/opensky-api/rest.html" target="_blank" rel="noopener">OpenSky API documentation</a>. Browser requests can fail because of provider access rules, quotas or cross-origin restrictions.</footer>
+   <div class="actions"><button id="json">Export JSON</button><button id="csv">Export CSV</button></div>
+   <footer><a href="https://openskynetwork.github.io/opensky-api/rest.html" target="_blank" rel="noopener">OpenSky API documentation</a></footer>
   </section>
   <section class="panel">
-   <div class="panelhead"><div><h2>Satellite map</h2><div class="muted">Select an aircraft marker to inspect its reported state.</div></div><div class="actions"><button id="center">Center East Africa</button><button id="fullscreen">Full screen</button><button id="layer">Map: Satellite</button></div></div>
-   <div id="map"></div><div id="mapStatus" class="status" style="margin-top:10px">Loading map…</div>
+   <div class="panelhead">
+    <div><h2>Satellite map</h2><div class="muted">Select a marker for aircraft details.</div></div>
+    <div class="actions"><button id="center">Center East Africa</button><button id="fullscreen">Full screen</button><button id="layer">Map: Satellite</button></div>
+   </div>
+   <div id="map"></div>
+   <div id="mapStatus" class="status">Loading map…</div>
    <div id="details" class="detail">Select an aircraft from the list or map.</div>
-   <footer>Satellite imagery: EOX Sentinel-2 cloudless. Availability depends on the tile provider.</footer>
+   <footer>Imagery: EOX Sentinel-2. Satellite tile availability depends on the provider.</footer>
   </section>
  </div>
- <footer>AAMush Aegis Africa · Live satellite-based aircraft tracking requires authorized provider access and a secure backend.</footer>
 </main>
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script>
@@ -85,18 +105,31 @@ a{color:#76e6df}
 const $=id=>document.getElementById(id);
 const EAST={west:25,south:-18,east:53,north:16};
 let aircraft=[],selected=null,markers=new Map(),timer=null,lastUpdated=null,map=null,mapLayer="satellite",busy=false;
+
 function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function fmt(v,u=""){return Number.isFinite(v)?Math.round(v).toLocaleString()+u:"—";}
-function distance(lat,lon){const r=Math.PI/180,a=lat*r,b=-6.8*r,dl=(39.2-lon)*r,x=Math.sin((b-a)/2)**2+Math.cos(a)*Math.cos(b)*Math.sin(dl/2)**2;return 6371*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
-function feedStatus(text,ok){$("feedStatus").textContent=text;$("feedStatus").className="status "+(ok?"good":"bad");}
-function normalize(s){return{hex:String(s[0]||"").trim().toLowerCase(),callsign:String(s[1]||"").trim()||"Unknown",country:s[2]||"Unknown",positionTime:s[3]||null,lastContact:s[4]||null,lon:typeof s[5]==="number"?s[5]:null,lat:typeof s[6]==="number"?s[6]:null,altitude:typeof s[7]==="number"?s[7]:null,ground:!!s[8],speed:typeof s[9]==="number"?s[9]:null,heading:typeof s[10]==="number"?s[10]:null,verticalRate:typeof s[11]==="number"?s[11]:null,geoAltitude:typeof s[13]==="number"?s[13]:null,squawk:s[14]||null};}
+function distance(lat,lon){
+ const r=Math.PI/180,a=lat*r,b=-6.8*r,dl=(39.2-lon)*r;
+ const x=Math.sin((b-a)/2)**2+Math.cos(a)*Math.cos(b)*Math.sin(dl/2)**2;
+ return 6371*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
+}
+function setFeed(text,ok){$("feedStatus").textContent=text;$("feedStatus").className="status "+(ok?"good":"bad");}
+function normalize(s){
+ return {hex:String(s[0]||"").trim().toLowerCase(),callsign:String(s[1]||"").trim()||"Unknown",
+ country:s[2]||"Unknown",positionTime:s[3]||null,lastContact:s[4]||null,
+ lon:typeof s[5]==="number"?s[5]:null,lat:typeof s[6]==="number"?s[6]:null,
+ altitude:typeof s[7]==="number"?s[7]:null,ground:!!s[8],
+ speed:typeof s[9]==="number"?s[9]:null,heading:typeof s[10]==="number"?s[10]:null,
+ verticalRate:typeof s[11]==="number"?s[11]:null,geoAltitude:typeof s[13]==="number"?s[13]:null,squawk:s[14]||null};
+}
 function initMap(){
- if(!window.maplibregl){$("mapStatus").textContent="Map library unavailable; check internet";return;}
+ if(!window.maplibregl){$("mapStatus").textContent="Map library unavailable. Check internet access.";return;}
  try{
-  map=new maplibregl.Map({container:"map",center:[39.2,-6.8],zoom:4,style:{version:8,sources:{
-   satellite:{type:"raster",tiles:["https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2020_3857/default/g/{z}/{y}/{x}.jpg"],tileSize:256,attribution:"Imagery © EOX / Sentinel-2"},
-   street:{type:"raster",tiles:["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],tileSize:256,attribution:"© OpenStreetMap contributors"}
-  },layers:[{id:"imagery",type:"raster",source:"satellite"}]}});
+  map=new maplibregl.Map({container:"map",center:[39.2,-6.8],zoom:4,style:{version:8,
+   sources:{
+    satellite:{type:"raster",tiles:["https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2020_3857/default/g/{z}/{y}/{x}.jpg"],tileSize:256,attribution:"Imagery © EOX / Sentinel-2"},
+    street:{type:"raster",tiles:["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],tileSize:256,attribution:"© OpenStreetMap contributors"}
+   },layers:[{id:"imagery",type:"raster",source:"satellite"}]}});
   map.addControl(new maplibregl.NavigationControl(),"top-right");
   map.on("load",()=>{$("mapStatus").textContent="Map loaded";$("mapStatus").className="status good";drawMarkers();});
   map.on("error",()=>{$("mapStatus").textContent="Map tile/network warning";});
@@ -107,36 +140,54 @@ function filtered(){
  let arr=aircraft.filter(a=>(!q||a.callsign.toLowerCase().includes(q)||a.hex.includes(q))&&a.lat!==null&&a.lon!==null);
  if($("scope").value==="east")arr=arr.filter(a=>a.lat>=EAST.south&&a.lat<=EAST.north&&a.lon>=EAST.west&&a.lon<=EAST.east);
  const s=$("sort").value;
- arr.sort((a,b)=>s==="callsign"?a.callsign.localeCompare(b.callsign):s==="altitude"?(b.altitude||0)-(a.altitude||0):s==="speed"?(b.speed||0)-(a.speed||0):distance(a.lat,a.lon)-distance(b.lat,b.lon));
+ arr.sort((a,b)=>s==="callsign"?a.callsign.localeCompare(b.callsign):
+ s==="altitude"?(b.altitude??-Infinity)-(a.altitude??-Infinity):
+ s==="speed"?(b.speed??-Infinity)-(a.speed??-Infinity):distance(a.lat,a.lon)-distance(b.lat,b.lon));
  return arr;
 }
 async function refreshFeed(){
- if(busy)return;busy=true;$("refresh").disabled=true;$("refresh").textContent="Connecting…";feedStatus("Feed: CONNECTING",false);
+ if(busy)return;
+ busy=true;$("refresh").disabled=true;$("refresh").textContent="Connecting…";
+ setFeed("Aircraft feed: CONNECTING",false);$("error").textContent="";
  try{
   let url="https://opensky-network.org/api/states/all";
   if($("scope").value==="east")url+="?lamin="+EAST.south+"&lomin="+EAST.west+"&lamax="+EAST.north+"&lomax="+EAST.east;
-  const response=await fetch(url,{cache:"no-store"});
-  if(!response.ok)throw Error("Provider HTTP "+response.status);
+  const controller=new AbortController();
+  const timeout=setTimeout(()=>controller.abort(),20000);
+  let response;
+  try{response=await fetch(url,{cache:"no-store",signal:controller.signal});}
+  finally{clearTimeout(timeout);}
+  if(!response.ok)throw Error("Provider returned HTTP "+response.status);
   const data=await response.json();
   if(!Array.isArray(data.states))throw Error("Unexpected provider response");
-  aircraft=data.states.map(normalize);lastUpdated=new Date();
-  feedStatus("Feed: CONNECTED",true);
-  $("source").textContent="OpenSky Network · Retrieved "+lastUpdated.toLocaleString()+" · "+aircraft.length+" state records";
+  aircraft=data.states.map(normalize);
+  lastUpdated=new Date();
+  setFeed("Aircraft feed: CONNECTED",true);
+  $("source").textContent="OpenSky Network · Retrieved "+lastUpdated.toLocaleString()+" · "+aircraft.length+" records";
   render();
  }catch(e){
-  feedStatus("Feed: NOT CONNECTED",false);
-  $("source").textContent="Request failed: "+e.message+". No sample aircraft have been added.";
-  alert("Aircraft feed request failed: "+e.message+"\n\nA secured backend or provider authorization may be required.");
- }finally{busy=false;$("refresh").disabled=false;$("refresh").textContent="Refresh feed";}
+  setFeed("Aircraft feed: NOT CONNECTED",false);
+  $("error").textContent="Feed request failed: "+(e.name==="AbortError"?"Request timed out.":e.message)+" Check provider access or browser cross-origin restrictions.";
+  $("source").textContent="No new live data received. Last successful data, if any, is retained.";
+ }finally{
+  busy=false;$("refresh").disabled=false;$("refresh").textContent="Refresh feed";
+ }
 }
 function render(){
  const pos=aircraft.filter(a=>a.lat!==null&&a.lon!==null);
- $("total").textContent=aircraft.length.toLocaleString();$("positioned").textContent=pos.length.toLocaleString();
+ $("total").textContent=aircraft.length.toLocaleString();
+ $("positioned").textContent=pos.length.toLocaleString();
  $("airborne").textContent=aircraft.filter(a=>!a.ground&&a.lat!==null).length.toLocaleString();
  $("updated").textContent=lastUpdated?lastUpdated.toLocaleTimeString():"Never";
  const arr=filtered();
- $("list").innerHTML=arr.length?arr.slice(0,300).map(a=>`<div class="item ${selected===a.hex?"selected":""}" data-hex="${esc(a.hex)}"><div class="itemtop"><span class="callsign">${esc(a.callsign)}</span><span class="muted">${esc(a.hex)}</span></div><div class="facts"><span>Altitude: ${fmt(a.altitude," m")}</span><span>Speed: ${fmt(a.speed===null?NaN:a.speed*3.6," km/h")}</span><span>${a.ground?"On ground":"Not reported on ground"}</span></div></div>`).join(""):'<div class="muted">No aircraft with positions match these filters.</div>';
- $("list").querySelectorAll("[data-hex]").forEach(el=>el.addEventListener("click",()=>select(el.dataset.hex,true)));
+ $("list").innerHTML=arr.length?arr.slice(0,300).map(a=>
+ `<div class="item ${selected===a.hex?"selected":""}" data-hex="${esc(a.hex)}" tabindex="0" role="button">
+ <div class="itemtop"><span class="callsign">${esc(a.callsign)}</span><span class="muted">${esc(a.hex)}</span></div>
+ <div class="facts"><span>Altitude: ${fmt(a.altitude," m")}</span><span>Speed: ${fmt(a.speed===null?NaN:a.speed*3.6," km/h")}</span><span>${a.ground?"On ground":"Not reported on ground"}</span></div></div>`).join(""):'<div class="muted">No aircraft with positions match these filters.</div>';
+ $("list").querySelectorAll("[data-hex]").forEach(el=>{
+  el.addEventListener("click",()=>select(el.dataset.hex,true));
+  el.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" ")select(el.dataset.hex,true);});
+ });
  drawMarkers();
  const a=aircraft.find(x=>x.hex===selected);if(a)showDetails(a);
 }
@@ -144,7 +195,8 @@ function drawMarkers(){
  if(!map||!map.loaded())return;
  markers.forEach(m=>m.remove());markers.clear();
  filtered().slice(0,500).forEach(a=>{
-  const el=document.createElement("button");el.type="button";el.textContent="✈";el.title=a.callsign+" · "+a.hex;
+  const el=document.createElement("button");el.type="button";el.textContent="✈";
+  el.title=a.callsign+" · "+a.hex;
   el.style.cssText="padding:2px;width:30px;height:30px;border-radius:50%;background:#007e7c;border:2px solid #e6c36b;color:white";
   const marker=new maplibregl.Marker({element:el}).setLngLat([a.lon,a.lat]).addTo(map);
   el.addEventListener("click",()=>select(a.hex,false));markers.set(a.hex,marker);
@@ -153,47 +205,63 @@ function drawMarkers(){
 function showDetails(a){
  $("details").innerHTML=`<h2>${esc(a.callsign)}</h2><div class="grid">
  <div><span>ICAO address</span><strong>${esc(a.hex)}</strong></div><div><span>Country</span><strong>${esc(a.country)}</strong></div>
- <div><span>Altitude</span><strong>${fmt(a.altitude," m")}</strong></div><div><span>Ground speed</span><strong>${fmt(a.speed===null?NaN:a.speed*3.6," km/h")}</strong></div>
+ <div><span>Barometric altitude</span><strong>${fmt(a.altitude," m")}</strong></div>
+ <div><span>Ground speed</span><strong>${fmt(a.speed===null?NaN:a.speed*3.6," km/h")}</strong></div>
  <div><span>Heading</span><strong>${fmt(a.heading,"°")}</strong></div><div><span>Vertical rate</span><strong>${fmt(a.verticalRate," m/s")}</strong></div>
  <div><span>Latitude</span><strong>${fmt(a.lat)}</strong></div><div><span>Longitude</span><strong>${fmt(a.lon)}</strong></div>
  <div><span>Squawk</span><strong>${esc(a.squawk||"—")}</strong></div>
  <div><span>Position time</span><strong>${a.positionTime?new Date(a.positionTime*1000).toLocaleString():"Unavailable"}</strong></div>
  <div><span>Last contact</span><strong>${a.lastContact?new Date(a.lastContact*1000).toLocaleString():"Unavailable"}</strong></div>
- <div><span>State</span><strong>${a.ground?"On ground":"Not reported on ground"}</strong></div></div>`;
+ <div><span>Reported state</span><strong>${a.ground?"On ground":"Not reported on ground"}</strong></div></div>`;
 }
 function select(hex,fly){
- selected=hex;const a=aircraft.find(x=>x.hex===hex);if(!a)return;showDetails(a);
+ selected=hex;const a=aircraft.find(x=>x.hex===hex);if(!a)return;
+ showDetails(a);
  $("list").querySelectorAll("[data-hex]").forEach(el=>el.classList.toggle("selected",el.dataset.hex===hex));
  if(fly&&map&&a.lat!==null&&a.lon!==null)map.flyTo({center:[a.lon,a.lat],zoom:7});
 }
 function download(name,text,type){
- const url=URL.createObjectURL(new Blob([text],{type})),a=document.createElement("a");
- a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+ const url=URL.createObjectURL(new Blob([text],{type}));
+ const a=document.createElement("a");a.href=url;a.download=name;
+ document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 $("refresh").addEventListener("click",refreshFeed);
-$("auto").addEventListener("click",()=>{if(timer){clearInterval(timer);timer=null;$("auto").textContent="Auto-refresh: Off";}else{timer=setInterval(refreshFeed,60000);$("auto").textContent="Auto-refresh: On";refreshFeed();}});
+$("auto").addEventListener("click",()=>{
+ if(timer){clearInterval(timer);timer=null;$("auto").textContent="Auto-refresh: Off";}
+ else{timer=setInterval(refreshFeed,60000);$("auto").textContent="Auto-refresh: On";refreshFeed();}
+});
 $("search").addEventListener("input",render);
-$("scope").addEventListener("change",()=>{render();if(lastUpdated)refreshFeed();});
+$("scope").addEventListener("change",()=>{render();refreshFeed();});
 $("sort").addEventListener("change",render);
-$("clear").addEventListener("click",()=>{$("search").value="";$("sort").value="distance";$("scope").value="east";render();});
-$("json").addEventListener("click",()=>download("aegis-aircraft.json",JSON.stringify({exportedAt:new Date().toISOString(),source:"OpenSky Network response",aircraft},null,2),"application/json"));
+$("clear").addEventListener("click",()=>{
+ $("search").value="";$("sort").value="distance";$("scope").value="east";render();refreshFeed();
+});
+$("json").addEventListener("click",()=>download("aegis-aircraft-data.json",
+ JSON.stringify({exportedAt:new Date().toISOString(),source:"OpenSky Network",
+ lastSuccessfulUpdate:lastUpdated?lastUpdated.toISOString():null,aircraft},null,2),"application/json"));
 $("csv").addEventListener("click",()=>{
  const cols=["hex","callsign","country","lat","lon","altitude","ground","speed","heading","verticalRate","squawk","positionTime","lastContact"];
  const quote=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
- download("aegis-aircraft.csv",[cols.join(","),...aircraft.map(a=>cols.map(k=>quote(a[k])).join(","))].join("\r\n"),"text/csv;charset=utf-8");
+ download("aegis-aircraft-data.csv",[cols.join(","),...aircraft.map(a=>cols.map(k=>quote(a[k])).join(","))].join("\r\n"),"text/csv;charset=utf-8");
 });
 $("center").addEventListener("click",()=>{if(map)map.flyTo({center:[39.2,-6.8],zoom:4});});
-$("fullscreen").addEventListener("click",async()=>{try{if(!document.fullscreenElement)await $("map").requestFullscreen();else await document.exitFullscreen();setTimeout(()=>map&&map.resize(),250);}catch(e){alert("Full screen is not available in this browser.");}});
+$("fullscreen").addEventListener("click",async()=>{
+ try{if(!document.fullscreenElement)await $("map").requestFullscreen();else await document.exitFullscreen();setTimeout(()=>map&&map.resize(),250);}
+ catch(e){$("mapStatus").textContent="Full screen unavailable";}
+});
 $("layer").addEventListener("click",()=>{
  if(!map||!map.getLayer("imagery"))return;
  mapLayer=mapLayer==="satellite"?"street":"satellite";
- if(!map.getSource("street"))map.addSource("street",{type:"raster",tiles:["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],tileSize:256,attribution:"© OpenStreetMap contributors"});
  if(!map.getLayer("street-layer"))map.addLayer({id:"street-layer",type:"raster",source:"street",layout:{visibility:"none"}});
  map.setLayoutProperty("imagery","visibility",mapLayer==="satellite"?"visible":"none");
  map.setLayoutProperty("street-layer","visibility",mapLayer==="street"?"visible":"none");
  $("layer").textContent="Map: "+(mapLayer==="satellite"?"Satellite":"Street");
 });
-function tick(){$("clock").textContent=new Date().toLocaleTimeString();$("network").textContent=navigator.onLine?"Network: online":"Network: offline";$("network").className="status "+(navigator.onLine?"good":"bad");}
+function tick(){
+ $("clock").textContent=new Date().toLocaleTimeString();
+ $("network").textContent=navigator.onLine?"Network: online":"Network: offline";
+ $("network").className="status "+(navigator.onLine?"good":"bad");
+}
 window.addEventListener("online",tick);window.addEventListener("offline",tick);
 initMap();tick();setInterval(tick,1000);
 })();
